@@ -1094,9 +1094,9 @@ void __fastcall TTotalForm::DisplayChannelInfo()
 				if(tray.cell[i] == 1){
 				//* 2024 04 10 충전종료에러 때문에 조건 수정
 				//* volt, curr -> final_volt, final_curr
-				//* 10, 1000 => 100, 500
+				//* 10, 1000 => 100, 1000
 					if(real_data.final_result[i] == "0" || real_data.final_result[i] == "2"
-						|| (real_data.final_curr[i] < 100 && real_data.final_volt[i] < 500)){
+						|| (real_data.final_curr[i] < 100 && real_data.final_volt[i] < 1000)){
 						//* 결과 NG
 						panel[i]->Color = cl_error->Color;
       				}
@@ -1197,7 +1197,7 @@ AnsiString __fastcall TTotalForm::GetCodeColor(TPanel *pnl, int index)
 	else {
         //* 2025 03 05 status 0 : idle, -2 : done, -4, -5 : abort, -6 : chan exit, -7 : HW Fail
 		if(real_data.status[index] < -2
-			|| (BaseForm->StringToDouble(real_data.curr[index], 0) < 100 && BaseForm->StringToDouble(real_data.volt[index], 0) < 500))
+			|| (testTime->Caption.ToIntDef(0) > 25 && BaseForm->StringToDouble(real_data.curr[index], 0) < 100 && BaseForm->StringToDouble(real_data.volt[index], 0) < 1000))
 			clr = cl_error->Color;
 		else
 			clr = cl_charge->Color;
@@ -2626,4 +2626,5 @@ void __fastcall TTotalForm::lblTitleDblClick(TObject *Sender)
     chkCellIdBypass->Visible = !chkCellIdBypass->Visible;
 }
 //---------------------------------------------------------------------------
+
 
