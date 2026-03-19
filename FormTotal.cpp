@@ -1096,7 +1096,8 @@ void __fastcall TTotalForm::DisplayChannelInfo()
 				//* volt, curr -> final_volt, final_curr
 				//* 10, 1000 => 100, 1000
 					if(real_data.final_result[i] == "0" || real_data.final_result[i] == "2"
-						|| (real_data.final_curr[i] < 100 && real_data.final_volt[i] < 1000)){
+						|| (BaseForm->StringToDouble(real_data.final_curr[i], 0) < 100
+                        	&& BaseForm->StringToDouble(real_data.final_volt[i], 0) < 1000)){
 						//* 결과 NG
 						panel[i]->Color = cl_error->Color;
       				}
@@ -1311,7 +1312,7 @@ void __fastcall TTotalForm::SetResultList()
         //* 셀이 없을 때 RUNNING(1), OK(4) 는 NG (셀이 없으면 충전이 안되어야 함.)
 		else if(tray.cell[index] == 0)
 		{
-            if(fVolt > 500 && fCurr > 100)
+            if(fVolt > 1000 && fCurr > 100)
                 tray.measure_result[index] = 0;
             else
                 tray.measure_result[index] = 1;
