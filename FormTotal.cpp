@@ -1097,7 +1097,7 @@ void __fastcall TTotalForm::DisplayChannelInfo()
 				//* 10, 1000 => 100, 1000
 					if(real_data.final_result[i] == "0" || real_data.final_result[i] == "2"
 						|| (BaseForm->StringToDouble(real_data.final_curr[i], 0) < 100
-                        	&& BaseForm->StringToDouble(real_data.final_volt[i], 0) < 1000)){
+                        	&& BaseForm->StringToDouble(real_data.final_volt[i], 0) < 1200)){
 						//* °á°ú NG
 						panel[i]->Color = cl_error->Color;
       				}
@@ -1779,7 +1779,8 @@ void __fastcall TTotalForm::ProcessRPY(AnsiString param)
 
     if(LASTCMD == "REP"){
         SetFinalResult(param);
-    } else if(LASTCMD == "SET"){
+    }
+    else if(LASTCMD == "SET"){
         if(param.Pos("No error") > 0)
             MeasureInfoForm->nSetStep = 1; // check setup
 		else{
