@@ -37,6 +37,7 @@ __fastcall TTotalForm::TTotalForm(TComponent* Owner)
 
 	testtime = 0;
 	curr_min = BaseForm->StringToDouble(editCurrMin->Text, 50);
+    voltMin = 1200;
 
 	no_file_error_count = 0;
 	tray.trayin = false;
@@ -1094,10 +1095,10 @@ void __fastcall TTotalForm::DisplayChannelInfo()
 				if(tray.cell[i] == 1){
 				//* 2024 04 10 충전종료에러 때문에 조건 수정
 				//* volt, curr -> final_volt, final_curr
-				//* 10, 1000 => 100, 1000
+				//* 10, 1000 => 100, 1200
 					if(real_data.final_result[i] == "0" || real_data.final_result[i] == "2"
 						|| (BaseForm->StringToDouble(real_data.final_curr[i], 0) < 100
-                        	&& BaseForm->StringToDouble(real_data.final_volt[i], 0) < 1200)){
+                        	&& BaseForm->StringToDouble(real_data.final_volt[i], 0) < voltMin)){
 						//* 결과 NG
 						panel[i]->Color = cl_error->Color;
       				}
@@ -1112,30 +1113,32 @@ void __fastcall TTotalForm::DisplayChannelInfo()
 					m_sTempCurr[i] = "0.0";
                     m_sTempVlot[i] = "0.0";
                 }
+                else{
+                    if(real_data.final_volt[i] != "") m_sTempVlot[i] = real_data.final_volt[i];
+					if(real_data.final_curr[i] != "") m_sTempCurr[i] = real_data.final_curr[i];
+                }
 			}
 			else if(tray.ams)
 			{
-				 if(m_sTempCurr[i] != "Cell"
-                 	&& (real_data.status[i] > -2 && BaseForm->StringToDouble(real_data.volt[i],0) > 100)){
-					m_sTempVlot[i] = real_data.volt[i];
-					m_sTempCurr[i] = real_data.curr[i];
+                if(m_sTempCurr[i] != "Cell"){
+                    m_sTempVlot[i] = real_data.final_volt[i];
+                    if(real_data.status[i] > -2 && BaseForm->StringToDouble(real_data.volt[i],0) > 100){
+                    //m_sTempVlot[i] = real_data.volt[i];
+                    m_sTempCurr[i] = real_data.curr[i];
 
-					if(LimitVolt[i].ToDouble() < real_data.volt[i].ToDouble())
-						LimitVolt[i] = real_data.volt[i];
+                    if(LimitVolt[i].ToDouble() < BaseForm->StringToDouble(real_data.final_volt[i], 0))
+                        LimitVolt[i] = real_data.final_volt[i];
 
-					if(LimitCurr[i].ToDouble() < real_data.curr[i].ToDouble())
-						LimitCurr[i] = real_data.curr[i];
+                    if(LimitCurr[i].ToDouble() < BaseForm->StringToDouble(real_data.final_curr[i], 0))
+                        LimitCurr[i] = real_data.final_curr[i];
+                    }
+                    else{
+                    //m_sTempVlot[i] = real_data.volt[i];
+                    m_sTempCurr[i] = real_data.final_curr[i];
+                    }
+                }
 
-					//GetCodeColor(panel[i], i);
-				 }
-				 else{
-                    m_sTempVlot[i] = real_data.volt[i];
-					m_sTempCurr[i] = real_data.curr[i];
-
-					//GetCodeColor(panel[i], i);
-				 }
-
-                 if(testTime->Caption.ToIntDef(0) > 10)
+                if(testTime->Caption.ToIntDef(0) > 10)
 					GetCodeColor(panel[i], i);
 			}
 
@@ -1312,7 +1315,7 @@ void __fastcall TTotalForm::SetResultList()
         //* 셀이 없을 때 RUNNING(1), OK(4) 는 NG (셀이 없으면 충전이 안되어야 함.)
 		else if(tray.cell[index] == 0)
 		{
-            if(fVolt > 1000 && fCurr > 100)
+            if(fVolt > voltMin && fCurr > 100)
                 tray.measure_result[index] = 0;
             else
                 tray.measure_result[index] = 1;

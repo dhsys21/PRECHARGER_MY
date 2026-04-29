@@ -5797,7 +5797,7 @@ object TotalForm: TTotalForm
       NumbersOnly = True
       ParentFont = False
       TabOrder = 8
-      Text = '50'
+      Text = '100'
       Visible = False
     end
     object Panel1: TPanel

@@ -514,6 +514,7 @@ public:		// User declarations
 	AnsiString LimitVolt[MAXCHANNEL], LimitCurr[MAXCHANNEL];
 
 	int currMin;
+    int voltMin;
     void __fastcall displayprocesstest();
 
 	__fastcall TTotalForm(TComponent* Owner);
