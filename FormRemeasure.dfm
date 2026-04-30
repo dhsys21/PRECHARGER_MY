@@ -65,7 +65,7 @@ object RemeasureForm: TRemeasureForm
     Left = 978
     Top = 40
     Width = 257
-    Height = 190
+    Height = 248
     Caption = 'ACOUNT'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -74,28 +74,9 @@ object RemeasureForm: TRemeasureForm
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 0
-    object Panel39: TPanel
-      Left = 6
-      Top = 71
-      Width = 90
-      Height = 30
-      BevelOuter = bvNone
-      Caption = 'COUNT'
-      Color = 12353126
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWhite
-      Font.Height = -13
-      Font.Name = 'Tahoma'
-      Font.Style = [fsBold]
-      ParentBackground = False
-      ParentFont = False
-      ParentShowHint = False
-      ShowHint = False
-      TabOrder = 0
-    end
     object Panel40: TPanel
       Left = 6
-      Top = 103
+      Top = 166
       Width = 90
       Height = 30
       BevelOuter = bvNone
@@ -110,29 +91,11 @@ object RemeasureForm: TRemeasureForm
       ParentFont = False
       ParentShowHint = False
       ShowHint = False
-      TabOrder = 1
-    end
-    object pAccCnt: TPanel
-      Left = 98
-      Top = 71
-      Width = 150
-      Height = 30
-      BevelOuter = bvNone
-      Color = 8552834
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWhite
-      Font.Height = -13
-      Font.Name = 'Tahoma'
-      Font.Style = [fsBold]
-      ParentBackground = False
-      ParentFont = False
-      ParentShowHint = False
-      ShowHint = False
-      TabOrder = 2
+      TabOrder = 0
     end
     object pAccDate: TPanel
       Left = 98
-      Top = 103
+      Top = 166
       Width = 150
       Height = 30
       BevelOuter = bvNone
@@ -146,11 +109,11 @@ object RemeasureForm: TRemeasureForm
       ParentFont = False
       ParentShowHint = False
       ShowHint = False
-      TabOrder = 3
+      TabOrder = 1
     end
     object pcolor1: TPanel
-      Left = 9
-      Top = 152
+      Left = 7
+      Top = 208
       Width = 75
       Height = 30
       BevelKind = bkFlat
@@ -166,12 +129,12 @@ object RemeasureForm: TRemeasureForm
       ParentFont = False
       ParentShowHint = False
       ShowHint = False
-      TabOrder = 4
+      TabOrder = 2
       Visible = False
     end
     object pcolor2: TPanel
-      Left = 90
-      Top = 151
+      Left = 88
+      Top = 207
       Width = 75
       Height = 30
       BevelKind = bkFlat
@@ -187,11 +150,11 @@ object RemeasureForm: TRemeasureForm
       ParentFont = False
       ParentShowHint = False
       ShowHint = False
-      TabOrder = 5
+      TabOrder = 3
     end
     object pcolor4: TPanel
-      Left = 174
-      Top = 152
+      Left = 172
+      Top = 208
       Width = 75
       Height = 30
       BevelKind = bkFlat
@@ -207,7 +170,7 @@ object RemeasureForm: TRemeasureForm
       ParentFont = False
       ParentShowHint = False
       ShowHint = False
-      TabOrder = 6
+      TabOrder = 4
       Visible = False
     end
     object AccInitBtn: TAdvSmoothButton
@@ -242,10 +205,121 @@ object RemeasureForm: TRemeasureForm
       Caption = 'Initialize'
       Color = clWhite
       ParentFont = False
-      TabOrder = 7
+      TabOrder = 5
       Version = '2.1.1.5'
       OnClick = AccInitBtnClick
       TMSStyle = 8
+    end
+    object Panel20: TPanel
+      Left = 6
+      Top = 70
+      Width = 90
+      Height = 30
+      BevelOuter = bvNone
+      Caption = 'CHANNEL'
+      Color = 12353126
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWhite
+      Font.Height = -13
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentBackground = False
+      ParentFont = False
+      ParentShowHint = False
+      ShowHint = False
+      TabOrder = 6
+    end
+    object pChannel: TPanel
+      Left = 98
+      Top = 70
+      Width = 150
+      Height = 30
+      BevelOuter = bvNone
+      Color = 8552834
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWhite
+      Font.Height = -13
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentBackground = False
+      ParentFont = False
+      ParentShowHint = False
+      ShowHint = False
+      TabOrder = 7
+    end
+    object Panel37: TPanel
+      Left = 6
+      Top = 102
+      Width = 90
+      Height = 30
+      BevelOuter = bvNone
+      Caption = 'POS'
+      Color = 12353126
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWhite
+      Font.Height = -13
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentBackground = False
+      ParentFont = False
+      ParentShowHint = False
+      ShowHint = False
+      TabOrder = 8
+    end
+    object pPos: TPanel
+      Left = 98
+      Top = 102
+      Width = 150
+      Height = 30
+      BevelOuter = bvNone
+      Color = 8552834
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWhite
+      Font.Height = -13
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentBackground = False
+      ParentFont = False
+      ParentShowHint = False
+      ShowHint = False
+      TabOrder = 9
+    end
+    object Panel36: TPanel
+      Left = 6
+      Top = 134
+      Width = 90
+      Height = 30
+      BevelOuter = bvNone
+      Caption = 'NG COUNT'
+      Color = 12353126
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWhite
+      Font.Height = -13
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentBackground = False
+      ParentFont = False
+      ParentShowHint = False
+      ShowHint = False
+      TabOrder = 10
+    end
+    object pNgTotalUse: TPanel
+      Left = 98
+      Top = 134
+      Width = 150
+      Height = 30
+      BevelOuter = bvNone
+      Color = 8552834
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWhite
+      Font.Height = -13
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentBackground = False
+      ParentFont = False
+      ParentShowHint = False
+      ShowHint = False
+      TabOrder = 11
     end
   end
   object pstage: TPanel
@@ -888,7 +962,7 @@ object RemeasureForm: TRemeasureForm
   object SaveDialog: TSaveDialog
     DefaultExt = '*.csv'
     Filter = 'Save(*.csv)|*.csv'
-    Left = 1024
-    Top = 305
+    Left = 1016
+    Top = 409
   end
 end

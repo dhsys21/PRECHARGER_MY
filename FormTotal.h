@@ -489,6 +489,7 @@ public:		// User declarations
 
 	int cnt;
 	int acc_remeasure[MAXCHANNEL];
+    int acc_totaluse[MAXCHANNEL];
 	int acc_cnt;
 	AnsiString acc_init;
 	int chMap[MAXCHANNEL + 1];

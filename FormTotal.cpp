@@ -1371,12 +1371,14 @@ void __fastcall TTotalForm::BadInfomation()
 			{
 				Mod_PLC->SetData(Mod_PLC->pc_Interface_Data, PC_D_PRE_MEASURE_OK_NG + i, j, true);
 				acc_remeasure[(i * 16) + j] += 1;   // 셀이 있고 에러일 때 count 증가
+                acc_totaluse[(i * 16) + j] += 1;
 				ngCount++;
 				NgCount++;
 			}
 			else if(tray.cell[(i * 16) + j] == 1 && tray.measure_result[(i * 16) + j] == 0)
 			{
 				Mod_PLC->SetData(Mod_PLC->pc_Interface_Data, PC_D_PRE_MEASURE_OK_NG + i, j, false);
+                acc_totaluse[(i * 16) + j] += 1;
 			}
             //* 셀이 없으면 1.
 			else
@@ -2203,6 +2205,7 @@ void __fastcall TTotalForm::btnNgInfoClick(TObject *Sender)
 {
     RemeasureForm->stage            = this->Tag;
 	RemeasureForm->acc_remeasure 	= acc_remeasure;
+    RemeasureForm->acc_totaluse     = acc_totaluse;
 	RemeasureForm->acc_init 		= &acc_init;
 	RemeasureForm->acc_cnt			= &acc_cnt;
 

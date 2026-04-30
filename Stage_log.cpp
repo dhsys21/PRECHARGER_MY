@@ -347,17 +347,19 @@ void __fastcall TTotalForm::ReadRemeasureInfo()
 
 	ini = new TIniFile((AnsiString)BIN_PATH + "RemeasureInfo.inf");
 
-	AnsiString retest_info;
+	AnsiString retest_info, strTotalUse;
 	AnsiString title = "REMEASURE" + IntToStr(this->Tag);
 
-	int pos = 0;
+	int pos = 0, posTotalNg = 0;
 
 	retest_info = ini->ReadString(title, "ACCMULATE", "-1");
+    strTotalUse = ini->ReadString(title, "TOTAL_USE", "-1");
     int nRemeasureAlarmCount = 0;
 	config.remeasure_alarm_cnt = ini->ReadInteger(title, "REMEASURE_ALARM_COUNT", 3);
 	editRemeasureAlarmCount->Text = config.remeasure_alarm_cnt;
 	RemeasureForm->pcolor2->Caption = config.remeasure_alarm_cnt;
 
+    //* 총 누적 불량
 	if(retest_info == "-1"){	// 파일이 존재하지 않으면
 		for(int index = 0; index < MAXCHANNEL; ++index){
 			acc_remeasure[index] = 0; 	// 모두 0으로
@@ -372,6 +374,19 @@ void __fastcall TTotalForm::ReadRemeasureInfo()
 			retest_info.Delete(1, pos);
 		}
 	}
+
+    //* 총 측정 횟수
+	if(strTotalUse == "-1"){	// 파일이 존재하지 않으면
+		for(int index = 0; index < MAXCHANNEL; ++index)
+			acc_totaluse[index] = 0; 	// 모두 0으로
+	} else{
+		for(int index = 0; index < MAXCHANNEL; ++index){
+			posTotalNg = strTotalUse.Pos("_");
+			acc_totaluse[index] = strTotalUse.SubString(1, posTotalNg - 1).ToIntDef(0);
+			strTotalUse.Delete(1, posTotalNg);
+		}
+	}
+
     RemeasureAlarm(nRemeasureAlarmCount);
 
 	retest_info = "";
@@ -388,7 +403,7 @@ void __fastcall TTotalForm::WriteRemeasureInfo()	// Tray가 Vacancy 상태일때 기록
 
 	ini = new TIniFile((AnsiString)BIN_PATH + "RemeasureInfo.inf");
 
-	AnsiString retest_info;
+	AnsiString retest_info = "", strTotalUse = "";
 	AnsiString title = "REMEASURE" + IntToStr(this->Tag);
 	retest_info = "";
 	int nRemeasureAlarmCount = 0;
@@ -397,7 +412,7 @@ void __fastcall TTotalForm::WriteRemeasureInfo()	// Tray가 Vacancy 상태일때 기록
 	retest_info = "";
 	for(int index=0; index<MAXCHANNEL; ++index){
 		retest_info =  retest_info + acc_remeasure[index] + "_";
-
+        strTotalUse = strTotalUse + acc_totaluse[index] + "_";
 		if(acc_remeasure[index] >= config.remeasure_alarm_cnt)
 			nRemeasureAlarmCount++;
 	}
@@ -405,6 +420,7 @@ void __fastcall TTotalForm::WriteRemeasureInfo()	// Tray가 Vacancy 상태일때 기록
 
 	ini->WriteInteger(title, "REMEASURE_ALARM_COUNT", editRemeasureAlarmCount->Text.ToIntDef(3));
 	ini->WriteString(title, "ACCMULATE", retest_info);
+    ini->WriteString(title, "TOTAL_USE", strTotalUse);
 	ini->WriteString(title, "ACCMULATE_DAY", acc_init);
 	ini->WriteInteger(title, "ACC_CNT", acc_cnt);
 
