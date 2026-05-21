@@ -110,6 +110,7 @@ void __fastcall TTotalForm::InitTrayStruct()
 void __fastcall TTotalForm::Initialization()
 {
     WritePLCLog("Init", "Initialization()");
+    this->InitTrayStruct();
 	for(int i = 0; i < MAXCHANNEL; i++)
 	{
 		m_sTempVlot[i] = i + 1;
@@ -132,8 +133,6 @@ void __fastcall TTotalForm::Initialization()
     testTime->Caption = "0";
 
 	PLCInitialization();
-	this->InitTrayStruct();
-
     InitCellSerial();
 
 	nSection = STEP_WAIT;
@@ -1093,12 +1092,15 @@ void __fastcall TTotalForm::DisplayChannelInfo()
 			if(tray.amf)
 			{
 				if(tray.cell[i] == 1){
-				//* 2024 04 10 충전종료에러 때문에 조건 수정
-				//* volt, curr -> final_volt, final_curr
-				//* 10, 1000 => 100, 1200
-					if(real_data.final_result[i] == "0" || real_data.final_result[i] == "2"
-						|| (BaseForm->StringToDouble(real_data.final_curr[i], 0) < 100
-                        	&& BaseForm->StringToDouble(real_data.final_volt[i], 0) < voltMin)){
+                	//* 2024 04 10 충전종료에러 때문에 조건 수정
+					//* volt, curr -> final_volt, final_curr
+					//* 10, 1000 => 100, 1200
+                    double f_volt = BaseForm->StringToDouble(real_data.final_volt[i], 0);
+                    double f_curr = BaseForm->StringToDouble(real_data.final_curr[i], 0);
+
+                    // 최종 결과 및 전압/전류 하한값 조건 검사로 합부 판정
+                    if(real_data.final_result[i] == "0" || real_data.final_result[i] == "2"
+                        || (f_curr < 100 && f_volt < voltMin)){
 						//* 결과 NG
 						panel[i]->Color = cl_error->Color;
       				}
@@ -1114,29 +1116,54 @@ void __fastcall TTotalForm::DisplayChannelInfo()
                     m_sTempVlot[i] = "0.0";
                 }
                 else{
-                    if(real_data.final_volt[i] != "") m_sTempVlot[i] = real_data.final_volt[i];
-					if(real_data.final_curr[i] != "") m_sTempCurr[i] = real_data.final_curr[i];
+                    if(real_data.final_volt[i] != "" && real_data.final_volt[i] != "0")
+                        m_sTempVlot[i] = real_data.final_volt[i];
+                    if(real_data.final_curr[i] != "" && real_data.final_curr[i] != "0")
+                        m_sTempCurr[i] = real_data.final_curr[i];
                 }
 			}
 			else if(tray.ams)
 			{
                 if(m_sTempCurr[i] != "Cell"){
-                    m_sTempVlot[i] = real_data.final_volt[i];
-                    if(real_data.status[i] > -2 && BaseForm->StringToDouble(real_data.volt[i],0) > 100){
-                    //m_sTempVlot[i] = real_data.volt[i];
-                    m_sTempCurr[i] = real_data.curr[i];
+                    if(real_data.status[i] > -2) // 상태가 정상일 때
+                    {
+                        double currentVolt = BaseForm->StringToDouble(real_data.volt[i], 0);
+                        double currentCurr = BaseForm->StringToDouble(real_data.curr[i], 0);
 
-                    if(LimitVolt[i].ToDouble() < BaseForm->StringToDouble(real_data.final_volt[i], 0))
-                        LimitVolt[i] = real_data.final_volt[i];
+                        // --- [전압 업데이트 조건] ---
+                        // 실시간 전압이 정상(100 이상)일 때만 업데이트 및 피크값 유지
+                        if(currentVolt > 100)
+                        {
+                            m_sTempVlot[i] = real_data.volt[i];
+                            if(LimitVolt[i].ToDouble() < currentVolt)
+                                LimitVolt[i] = real_data.volt[i];
+                        }
+                        else
+                        {
+                            // 전압이 0으로 튀었다면? 기존에 저장된 final_volt를 보여줌 (유지)
+                            if(real_data.final_volt[i] != "" && real_data.final_volt[i] != "0")
+                                m_sTempVlot[i] = real_data.final_volt[i];
+                        }
 
-                    if(LimitCurr[i].ToDouble() < BaseForm->StringToDouble(real_data.final_curr[i], 0))
-                        LimitCurr[i] = real_data.final_curr[i];
+                        // --- [전류 업데이트 조건] ---
+                        // 전류는 0이 오더라도 실시간으로 보여주거나, 충전 중(10 이상)일 때 업데이트
+                        if(fabs(currentCurr) > 10) // 어느 정도 전류가 흐를 때
+                        {
+                            m_sTempCurr[i] = real_data.curr[i];
+                            if(LimitCurr[i].ToDouble() < fabs(currentCurr))
+                                LimitCurr[i] = real_data.curr[i];
+                        }
+                        else
+                        {
+                            m_sTempCurr[i] = real_data.curr[i]; // 0이면 0 그대로 표시
+                        }
                     }
-                    else{
-                    //m_sTempVlot[i] = real_data.volt[i];
-                    m_sTempCurr[i] = real_data.final_curr[i];
+                    else // 상태가 -2 이하(종료 등)일 때
+                    {
+                        m_sTempVlot[i] = real_data.final_volt[i];
+                        m_sTempCurr[i] = real_data.final_curr[i];
                     }
-                }
+                 }
 
                 if(testTime->Caption.ToIntDef(0) > 10)
 					GetCodeColor(panel[i], i);
@@ -1177,13 +1204,15 @@ void __fastcall TTotalForm::DisplayChannelInfo()
 					}
 				}
 
-				MeasureInfoForm->pvolt[i]->Caption = m_sTempVlot[i];
-				MeasureInfoForm->pcurr[i]->Caption = m_sTempCurr[i];
+                if(tray.cell[i] == 1){
+					MeasureInfoForm->pvolt[i]->Caption = m_sTempVlot[i];
+					MeasureInfoForm->pcurr[i]->Caption = m_sTempCurr[i];
 
-                //* Graph Start
-                MeasureInfoForm->chartVoltage->Series[0]->YValue[i + 1] = BaseForm->StringToDouble(m_sTempVlot[i], 0);
-                MeasureInfoForm->chartCurrent->Series[0]->YValue[i + 1] = BaseForm->StringToDouble(m_sTempCurr[i], 0);
-				//* Graph End
+                    //* Graph Start
+                    MeasureInfoForm->chartVoltage->Series[0]->YValue[i + 1] = BaseForm->StringToDouble(m_sTempVlot[i], 0);
+                    MeasureInfoForm->chartCurrent->Series[0]->YValue[i + 1] = BaseForm->StringToDouble(m_sTempCurr[i], 0);
+                    //* Graph End
+                }
 			}
 		}
 	}catch(...){}
@@ -1973,12 +2002,18 @@ void __fastcall TTotalForm::SetFinalData()
         tempVolt = BaseForm->StringToDouble(real_data.volt[nIndex], 0);
         tempCurr = BaseForm->StringToDouble(real_data.curr[nIndex], 0);
 
-		if(/*real_data.status[nIndex] == 2 || */(real_data.status[nIndex] > -2 && tempVolt > 100)){
+		if(real_data.status[nIndex] > -2 && tempVolt > 100){
 			real_data.final_status[nIndex] = real_data.status[nIndex];
             real_data.final_volt[nIndex] = real_data.volt[nIndex];
             real_data.final_curr[nIndex] = real_data.curr[nIndex];
             real_data.final_capa[nIndex] = real_data.capa[nIndex];
 		}
+        else if(real_data.status[nIndex] > -2 && tempVolt <= 100){
+            real_data.final_status[nIndex] = real_data.status[nIndex];
+            real_data.final_volt[nIndex] = "0";
+            real_data.final_curr[nIndex] = "0";
+            real_data.final_capa[nIndex] = "0";
+        }
 		//* -2는 무시, -2는 done 상태로 전압, 전류값이 점점 줄어든다.
         //* => 이 값은 final 데이터로 처리하면 안됨.
 		else if(real_data.status[nIndex] < -2){
