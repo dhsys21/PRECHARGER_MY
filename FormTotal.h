@@ -437,6 +437,7 @@ public:		// User declarations
     void __fastcall CmdCAL();
     void __fastcall CmdSTC();;
 
+    void __fastcall ClientRead_Old();
 	AnsiString __fastcall GetCodeColor(TPanel *pnl, int index);
 	AnsiString __fastcall GetCodeColor2(TPanel *pnl, int index);
 

@@ -1533,13 +1533,55 @@ void __fastcall TTotalForm::ClientRead(TObject *Sender, TCustomWinSocket *Socket
     unsigned char buffer[bufferSize] = {0};  // 바이트 데이터를 저장할 버퍼
     int bytesReceived = Socket->ReceiveBuf(buffer, bufferSize);
 
+    int MONLENGTH = 4818;
     if(bytesReceived > 0){
         dataBuffer.insert(dataBuffer.end(), buffer, buffer + bytesReceived);
 
-        AnsiString hexOutput;
-        for(int i = 0; i < dataBuffer.size(); i++){
-            hexOutput += IntToHex(dataBuffer[i], 2);
+        // @(0x40)로 시작하는지 확인
+        if (!dataBuffer.empty() && dataBuffer[0] == 0x40) {
+
+            // @MON 데이터인지 확인 (최소 4바이트 이상 모였을 때 검사)
+            bool isMON = (dataBuffer.size() >= 4 && dataBuffer[1] == 'M' && dataBuffer[2] == 'O' && dataBuffer[3] == 'N');
+
+            if (isMON) {
+                // 1. @MON 데이터: 정확히 9636바이트가 차고, 그 끝이 세미콜론(0x3B)인지 확인
+                if (dataBuffer.size() >= MONLENGTH && dataBuffer[MONLENGTH - 1] == 0x3B) {
+                    int monlength = dataBuffer.size();
+                    AnsiString finalHex;
+                    for (size_t i = 0; i < MONLENGTH; i++) {
+                        finalHex += IntToHex(dataBuffer[i], 2);
+                    }
+                    rxq.push(finalHex.c_str());
+                    dataBuffer.clear(); // 처리 후 버퍼 비우기
+                }
+            }
+            else {
+                // 2. 일반 짧은 데이터: 원래 코드처럼 그냥 끝이 세미콜론(0x3B)인지 확인
+                if (dataBuffer.back() == 0x3B) {
+                    AnsiString finalHex;
+                    for (size_t i = 0; i < dataBuffer.size(); i++) {
+                        finalHex += IntToHex(dataBuffer[i], 2);
+                    }
+                    rxq.push(finalHex.c_str());
+                    dataBuffer.clear(); // 처리 후 버퍼 비우기
+                }
+            }
         }
+        else {
+            // 유효한 시작 바이트가 아니면 버퍼 초기화
+            dataBuffer.clear();
+        }
+    }
+}
+void __fastcall TTotalForm::ClientRead_Old()
+{
+    const int bufferSize = 1024; // 버퍼 크기 설정
+    unsigned char buffer[bufferSize] = {0};  // 바이트 데이터를 저장할 버퍼
+    //int bytesReceived = Socket->ReceiveBuf(buffer, bufferSize);
+    int bytesReceived = 0;
+
+    if(bytesReceived > 0){
+        dataBuffer.insert(dataBuffer.end(), buffer, buffer + bytesReceived);
 
         // @로 시작하는지 확인
         if (!dataBuffer.empty() && dataBuffer[0] == 0x40) {
@@ -1683,7 +1725,7 @@ void __fastcall TTotalForm::ProcessMON(AnsiString param)
     int voltagelen = 8 * MAXCHANNEL;
     AnsiString voltage = monData2.SubString(runtimelen + statuslen + currentlen + 1, voltagelen);
 
-    int capacitylen = 8 * MAXCHANNEL;
+    int capacitylen = 4 * MAXCHANNEL;
     AnsiString capacity = monData2.SubString(runtimelen + statuslen + currentlen + voltagelen + 1, capacitylen);
 
     SET_MONDATA(run_count, runtime, status, current, voltage, capacity);
@@ -1890,9 +1932,6 @@ void __fastcall TTotalForm::SetCurrent(AnsiString strCurrent)
 
         ch = chMap[nIndex + 1];
 		real_data.curr[ch - 1] = FormatFloat("0.0", dVal);//FloatToStr(dVal);
-
-//		if(real_data.status[ch - 1] > 0)
-//			real_data.final_curr[ch - 1] = real_data.curr[ch - 1];
 	}
 }
 //---------------------------------------------------------------------------
@@ -1901,8 +1940,7 @@ void __fastcall TTotalForm::SetCapacity(AnsiString strCapacity)
     AnsiString hexStr = "";
     int ch = 0;
     for(int nIndex = 0; nIndex < MAXCHANNEL; nIndex++){
-        hexStr = strCapacity.SubString(nIndex * 8 + 7, 2) + strCapacity.SubString(nIndex * 8 + 5, 2)
-        	+ strCapacity.SubString(nIndex * 8 + 3, 2) + strCapacity.SubString(nIndex * 8 + 1, 2);
+        hexStr = strCapacity.SubString(nIndex * 4 + 3, 2) + strCapacity.SubString(nIndex * 4 + 1, 2);
 
         //uint32_t hexValue = StrToInt(AnsiString("$") + hexStr);
         uint32_t hexValue = strtoul(hexStr.c_str(), NULL, 16);
