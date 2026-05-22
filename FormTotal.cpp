@@ -976,7 +976,7 @@ void __fastcall TTotalForm::ChannelStatus()
     //* 50(precharge 20 + precharge2 30) + 2 == 52초 하면 50초까지 mon data 기록됨
     //* 37(precharge2) + 10(precharge) + 2(idle) = 49
     //* 파텍 마련 기준 : config.time 30 + settle time 7 + precharge 10 + idle 4(2->4) = 49 => 30 + 21(19->21);
-    int extraTime = 21;
+    int extraTime = 7; //* 2026 05 22 step을 1단계 precharge2로만 했을 경우 종료를 빠르게 해야함.
 	if(tray.ams == true && dTime > 30 && testTime->Caption.ToIntDef(0) > (config.time + extraTime))
 	{
         CmdStop();
@@ -1166,7 +1166,7 @@ void __fastcall TTotalForm::DisplayChannelInfo()
                  }
 
                 if(testTime->Caption.ToIntDef(0) > 10)
-					GetCodeColor(panel[i], i);
+					GetCodeColor2(panel[i], i);
 			}
 
 			if(MeasureInfoForm->Visible && MeasureInfoForm->stage == this->Tag)
@@ -1243,43 +1243,37 @@ AnsiString __fastcall TTotalForm::GetCodeColor(TPanel *pnl, int index)
 AnsiString __fastcall TTotalForm::GetCodeColor2(TPanel *pnl, int index)
 {
 	TColor clr = clBlack;
-	AnsiString str;
-	if(real_data.status[index] >= 0){
-//		int code = StrToInt(real_data.status_code[index]);
-		int code = BaseForm->StringToInt(real_data.status[index], 1);
+    AnsiString str;
 
-		switch(code){
-			case chstNone:
-				if(tray.cell[index] == 0) clr = cl_no->Color;
-				else clr = cl_error->Color;
-				break;
-			case chstRunning:		// 충전 Step
-				//if(tray.cell[index] == 0 && m_sTempVlot[index].ToDouble() > 500 && MeasureInfoForm->n_bManualStart == false)
-                if(tray.cell[index] == 0 && BaseForm->StringToDouble(m_sTempVlot[index], 0) > 500 && MeasureInfoForm->n_bManualStart == false)
-				{
-					clr = cl_outflow->Color;		// 유출
-				}
-				else if(tray.cell[index] == 0) clr = cl_no->Color;
-				else clr = cl_charge->Color;
-				break;
-			case chstFail:
-				if(tray.cell[index] == 0) clr = cl_no->Color;
-				else clr = cl_error->Color;
-				break;
-			case chstAbort:
-				if(tray.cell[index] == 0) clr = cl_no->Color;
-				else clr = cl_error->Color;
-				break;
-			case chstOK:
-				clr = cl_end->Color;
-				break;
-			default:
-				break;
-		}
+    // 1. 유출 체크 (셀이 없는데 전압이 높은 경우)
+    // 실시간 전압이 튈 수 있으므로 이 부분도 final_volt를 사용하는 것이 안정적입니다.
+    double f_volt = BaseForm->StringToDouble(real_data.final_volt[index], 0);
+    double f_curr = BaseForm->StringToDouble(real_data.final_curr[index], 0);
 
-		if(clr != clBlack) pnl->Color = clr;
-	}
-	return str;
+    if(tray.cell[index] == 0 && f_volt > 500 && MeasureInfoForm->n_bManualStart == false)
+    {
+        clr = cl_outflow->Color;        // 유출
+    }
+    else if(tray.cell[index] == 0)
+    {
+        clr = cl_no->Color;             // 셀 없음
+    }
+    else
+    {
+        if(real_data.status[index] < -2 || (fabs(f_curr) < 100 && f_volt < 500))
+        {
+            clr = cl_error->Color;      // 불량 (빨간색 등)
+        }
+        else
+        {
+            clr = cl_charge->Color;     // 정상 충전 중/완료 (하늘색/녹색 등)
+        }
+    }
+
+    if(clr != clBlack)
+        pnl->Color = clr;
+
+    return str;
 }
 //---------------------------------------------------------------------------
 void __fastcall TTotalForm::SetTrayID(AnsiString str_id)
