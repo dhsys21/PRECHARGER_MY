@@ -430,6 +430,7 @@ public:		// User declarations
     void __fastcall CmdEna();
 	void __fastcall CmdStop();
     void __fastcall CmdSetStep();
+    void __fastcall CmdSetStep2();
     void __fastcall CmdDischargeSetStep();
     bool __fastcall CmdCheckSet();
     void __fastcall CmdReport();

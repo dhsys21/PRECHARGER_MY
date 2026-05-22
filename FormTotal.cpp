@@ -654,7 +654,7 @@ void __fastcall TTotalForm::AutoInspection_Measure()
             else {
                 CmdEna();
                 Sleep(500);
-                CmdSetStep();
+                CmdSetStep2();
                 nStep = 2;
             }
             WriteCommLog("AutoInspection_Measure", "Set for charging, DisplayStatus(nRUN)");
@@ -676,7 +676,7 @@ void __fastcall TTotalForm::AutoInspection_Measure()
                     //* 2025 09 09 - 셋팅값이 틀리면 에러창 표시
                     if(Form_ErrorSet->Visible == false)
 					    Form_ErrorSet->DisplayErrorMessage(0);
-                    WriteCommLog("AutoInspection_Measure", "Precharger is not set. - run CmdSetStep()");
+                    WriteCommLog("AutoInspection_Measure", "Precharger is not set. - run CmdSetStep2()");
                 }
 			}
 			break;
@@ -758,9 +758,9 @@ void __fastcall TTotalForm::Timer_ManualInspectionTimer(TObject *Sender)
             else {
                 CmdEna();
                 BaseForm->WaitForMilliSeconds(1000);
-                CmdSetStep();
+                CmdSetStep2();
                 nManualStep = 1;
-            	WriteCommLog("SET", "SetTrayID - CmdSetStep()");
+            	WriteCommLog("SET", "SetTrayID - CmdSetStep2()");
             }
 			break;
 		case 1:
@@ -775,7 +775,7 @@ void __fastcall TTotalForm::Timer_ManualInspectionTimer(TObject *Sender)
                     //* 2025 09 09 - 셋팅값이 틀리면 에러창 표시
                     if(Form_ErrorSet->Visible == false)
 					    Form_ErrorSet->DisplayErrorMessage(0);
-                    WriteCommLog("AutoInspection_Measure", "Precharger is not set. - run CmdSetStep()");
+                    WriteCommLog("AutoInspection_Measure", "Precharger is not set. - run CmdSetStep2()");
                 }
             }
 			break;
@@ -2008,12 +2008,14 @@ void __fastcall TTotalForm::SetFinalData()
             real_data.final_curr[nIndex] = real_data.curr[nIndex];
             real_data.final_capa[nIndex] = real_data.capa[nIndex];
 		}
-        else if(real_data.status[nIndex] > -2 && tempVolt <= 100){
-            real_data.final_status[nIndex] = real_data.status[nIndex];
-            real_data.final_volt[nIndex] = "0";
-            real_data.final_curr[nIndex] = "0";
-            real_data.final_capa[nIndex] = "0";
-        }
+        //* 2026 05 22 중간에 전압값이 안올라오는 경우 final데이터도 문제가 발생.
+        //* 만셀이 아닌 경우 한번씩 일부채널에서 전압이 안올라오는 경우가 있음.
+//        else if(real_data.status[nIndex] > -2 && tempVolt <= 100){
+//            real_data.final_status[nIndex] = real_data.status[nIndex];
+//            real_data.final_volt[nIndex] = "0";
+//            real_data.final_curr[nIndex] = "0";
+//            real_data.final_capa[nIndex] = "0";
+//        }
 		//* -2는 무시, -2는 done 상태로 전압, 전류값이 점점 줄어든다.
         //* => 이 값은 final 데이터로 처리하면 안됨.
 		else if(real_data.status[nIndex] < -2){

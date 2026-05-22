@@ -247,6 +247,26 @@ void __fastcall TTotalForm::CmdSetStep()
     LASTCMD = "SET";
 }
 //---------------------------------------------------------------------------
+void __fastcall TTotalForm::CmdSetStep2()
+{
+    AnsiString CMD = "";
+	AnsiString cTime, cCurr, cVolt, cPrechargeTime, cPreCurr;
+
+    cPrechargeTime = IntToStr(PRECHARGETIME);
+    cTime = config.time;
+	cCurr = convertCondition2(config.curr);
+	cVolt = convertCondition2(config.volt);
+
+    CMD += "SEQ:STEP:DEF 1,1,PRECHARGE2," + cTime + "," + cCurr + "," + cVolt + "\n";
+    CMD += "SEQ:TEST:DEF 1,1,1,CURR_LE,0.01,AFTER,20,FAIL\n";
+    CMD += "SEQ:TEST:DEF 1,1,2,VOLT_LE,0.1,AFTER,20,FAIL\n";
+    CMD += "SYST:ERR?";
+    CMD = "TRB" + CMD + "\n";
+
+    SendData(CMD);
+    LASTCMD = "SET";
+}
+//---------------------------------------------------------------------------
 bool __fastcall TTotalForm::CmdCheckSet()
 {
     /// charge[0].time = charge[1].time = 30s
@@ -264,7 +284,6 @@ bool __fastcall TTotalForm::CmdCheckSet()
 		return true;
     return false;
 }
-
 //---------------------------------------------------------------------------
 void __fastcall TTotalForm::CmdDischargeSetStep()
 {

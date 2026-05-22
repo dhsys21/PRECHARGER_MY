@@ -536,7 +536,7 @@ void __fastcall TMeasureInfoForm::Timer_SetStepTimer(TObject *Sender)
     switch(nStep)
     {
         case 0:
-            BaseForm->nForm[stage]->CmdSetStep();
+            BaseForm->nForm[stage]->CmdSetStep2();
             nStep = 99;
         	break;
         case 1:
@@ -570,7 +570,7 @@ void __fastcall TMeasureInfoForm::Timer_SetStep2Timer(TObject *Sender)
     switch(nSetStep)
     {
         case 0:
-            BaseForm->nForm[stage]->CmdSetStep();
+            BaseForm->nForm[stage]->CmdSetStep2();
             nSetStep = 99;
         	break;
         case 1:
