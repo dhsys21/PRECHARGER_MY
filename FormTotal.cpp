@@ -976,7 +976,7 @@ void __fastcall TTotalForm::ChannelStatus()
     //* 50(precharge 20 + precharge2 30) + 2 == 52초 하면 50초까지 mon data 기록됨
     //* 37(precharge2) + 10(precharge) + 2(idle) = 49
     //* 파텍 마련 기준 : config.time 30 + settle time 7 + precharge 10 + idle 4(2->4) = 49 => 30 + 21(19->21);
-    int extraTime = 7; //* 2026 05 22 step을 1단계 precharge2로만 했을 경우 종료를 빠르게 해야함.
+    int extraTime = 17; //* 2026 05 22 step을 1단계 precharge2로만 했을 경우 종료를 빠르게 해야함.
 	if(tray.ams == true && dTime > 30 && testTime->Caption.ToIntDef(0) > (config.time + extraTime))
 	{
         CmdStop();

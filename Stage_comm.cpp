@@ -217,7 +217,7 @@ void __fastcall TTotalForm::CmdReport()
     LASTCMD = "REP";
 }
 //---------------------------------------------------------------------------
-void __fastcall TTotalForm::CmdSetStep()
+void __fastcall TTotalForm::CmdSetStep2()
 {
     AnsiString CMD = "";
     AnsiString cTime, cCurr, cVolt, cPrechargeTime;
@@ -237,8 +237,8 @@ void __fastcall TTotalForm::CmdSetStep()
     CMD = "SEQ:STEP:DEF 1,1,PRECHARGE," + cPrechargeTime + ",1.0,2.0\n";
     CMD += "SEQ:TEST:DEF 1,1,1,VOLT_GE,1.2,BEFORE,20,NEXT\n";
     CMD += "SEQ:STEP:DEF 1,2,PRECHARGE2," + cTime + "," + cCurr + "," + cVolt + "\n";
-    CMD += "SEQ:TEST:DEF 1,2,1,CURR_LE,0.01,BEFORE,20,FAIL\n";
-    CMD += "SEQ:TEST:DEF 1,2,2,VOLT_LE,0.1,BEFORE,20,FAIL\n";
+    CMD += "SEQ:TEST:DEF 1,2,1,CURR_LE,0.01,AFTER,20,FAIL\n";
+    CMD += "SEQ:TEST:DEF 1,2,2,VOLT_LE,0.1,AFTER,20,FAIL\n";
     //* 2026 03 20 후에 테스트 필요
     //CMD += "SEQ:TEST:DEF 1,2,3,CURR_LE,0.2,AFTER,20,NEXT \n";
     CMD += "SYST:ERR?";
@@ -247,7 +247,7 @@ void __fastcall TTotalForm::CmdSetStep()
     LASTCMD = "SET";
 }
 //---------------------------------------------------------------------------
-void __fastcall TTotalForm::CmdSetStep2()
+void __fastcall TTotalForm::CmdSetStep()
 {
     AnsiString CMD = "";
 	AnsiString cTime, cCurr, cVolt, cPrechargeTime, cPreCurr;
