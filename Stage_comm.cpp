@@ -235,7 +235,8 @@ void __fastcall TTotalForm::CmdSetStep2()
     // "SEQ:TEST:DEF 1,2,1,CURR_LE,0.01,BEFORE,60,FAIL"; // 10mA
     // "SEQ:TEST:DEF 1,1,1,VOLT_GE,2.0,BEFORE,20,NEX";
     CMD = "SEQ:STEP:DEF 1,1,PRECHARGE," + cPrechargeTime + ",1.0,2.0\n";
-    CMD += "SEQ:TEST:DEF 1,1,1,VOLT_GE,1.2,BEFORE,20,NEXT\n";
+//    CMD += "SEQ:TEST:DEF 1,1,1,VOLT_GE,1.2,BEFORE,20,NEXT\n"; //* 20260630 이전셋팅
+    CMD += "SEQ:TEST:DEF 1,1,1,VOLT_LE,-0.1,BEFORE_START,20,FAIL\n";
     CMD += "SEQ:STEP:DEF 1,2,PRECHARGE2," + cTime + "," + cCurr + "," + cVolt + "\n";
     CMD += "SEQ:TEST:DEF 1,2,1,CURR_LE,0.01,AFTER,20,FAIL\n";
     CMD += "SEQ:TEST:DEF 1,2,2,VOLT_LE,0.1,AFTER,20,FAIL\n";

@@ -1544,15 +1544,24 @@ void __fastcall TTotalForm::ClientRead(TObject *Sender, TCustomWinSocket *Socket
             bool isMON = (dataBuffer.size() >= 4 && dataBuffer[1] == 'M' && dataBuffer[2] == 'O' && dataBuffer[3] == 'N');
 
             if (isMON) {
-                // 1. @MON 데이터: 정확히 9636바이트가 차고, 그 끝이 세미콜론(0x3B)인지 확인
-                if (dataBuffer.size() >= MONLENGTH && dataBuffer[MONLENGTH - 1] == 0x3B) {
-                    int monlength = dataBuffer.size();
-                    AnsiString finalHex;
-                    for (size_t i = 0; i < MONLENGTH; i++) {
-                        finalHex += IntToHex(dataBuffer[i], 2);
+                // 1. @MON 데이터: 정확히 4818(9636)바이트가 차고, 그 끝이 세미콜론(0x3B)인지 확인
+                if (dataBuffer.size() >= MONLENGTH) {
+
+                    // 끝이 세미콜론(0x3B)으로 정상적으로 끝났는지 확인
+                    if (dataBuffer[MONLENGTH - 1] == 0x3B) {
+                        AnsiString finalHex;
+                        for (size_t i = 0; i < MONLENGTH; i++) {
+                            finalHex += IntToHex(dataBuffer[i], 2);
+                        }
+                        rxq.push(finalHex.c_str());
+                        dataBuffer.clear(); // 처리 후 버퍼 비우기
                     }
-                    rxq.push(finalHex.c_str());
-                    dataBuffer.clear(); // 처리 후 버퍼 비우기
+                    else {
+                        // [추가된 부분]
+                        // 길이가 4818까지 찼는데도 마지막 문자가 ';'가 아니면 데이터가 꼬인 것.
+                        // 무한정 대기하는 것을 막기 위해 버퍼를 강제로 비워줍니다.
+                        dataBuffer.clear();
+                    }
                 }
             }
             else {
