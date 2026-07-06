@@ -2210,6 +2210,7 @@ object MeasureInfoForm: TMeasureInfoForm
         ParentFont = False
         TabOrder = 11
         Version = '2.1.1.5'
+        OnClick = btnDisChargeClick
         TMSStyle = 8
       end
     end

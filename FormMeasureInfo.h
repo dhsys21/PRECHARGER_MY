@@ -133,6 +133,7 @@ __published:	// IDE-managed Components
 	void __fastcall btnDisChargeSetClick(TObject *Sender);
 	void __fastcall Timer_SetStepTimer(TObject *Sender);
 	void __fastcall Timer_SetStep2Timer(TObject *Sender);
+	void __fastcall btnDisChargeClick(TObject *Sender);
 
 private:	// User declarations
 	void __fastcall MakePanel(AnsiString type);

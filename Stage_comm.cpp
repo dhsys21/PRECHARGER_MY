@@ -179,6 +179,12 @@ void __fastcall TTotalForm::CmdReset()
     LASTCMD = "RST";
 }
 //---------------------------------------------------------------------------
+void __fastcall TTotalForm::CmdIDN()
+{
+    SendData("IDN");
+    LASTCMD = "IDN";
+}
+//---------------------------------------------------------------------------
 void __fastcall TTotalForm::CmdReboot()
 {
     SendData("RBT");

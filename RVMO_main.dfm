@@ -6233,7 +6233,6 @@ object BaseForm: TBaseForm
     Fill.ShadowOffset = 0
     Fill.Glow = gmNone
     Version = '1.5.2.1'
-    OnClick = AdvSmoothPanel_PLCClick
     TabOrder = 9
     TMSStyle = 0
   end
@@ -6272,7 +6271,6 @@ object BaseForm: TBaseForm
     Fill.ShadowOffset = 0
     Fill.Glow = gmNone
     Version = '1.5.2.1'
-    OnClick = AdvSmoothPanel_PLCClick
     TabOrder = 10
     TMSStyle = 0
   end

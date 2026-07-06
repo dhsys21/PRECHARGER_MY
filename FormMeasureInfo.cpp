@@ -634,3 +634,9 @@ void __fastcall TMeasureInfoForm::initChart(int volt, int curr)
 	chartCurrent->Series[2]->AddXY(400, curr - 1000);
 }
 //---------------------------------------------------------------------------
+void __fastcall TMeasureInfoForm::btnDisChargeClick(TObject *Sender)
+{
+    BaseForm->nForm[stage]->CmdIDN();
+}
+//---------------------------------------------------------------------------
+
